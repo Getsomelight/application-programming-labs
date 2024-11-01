@@ -29,12 +29,9 @@ def find_fm_names(data: str)->list:
     Extract female names starting with 'А' from the text
     Returns a list of unique names
     """
-    pattern = r'Имя: А\w+\nПол: Ж'
-    names = ''.join(re.findall(pattern, data))
-    pattern = r'А\w+'
-    answer = re.findall(pattern, names)
-    answer = list(set(answer))
-    return answer
+    pattern = r'(А\w+)\nПол: Ж'
+    answer = re.findall(pattern, data)
+    return list(set(answer))
 
 
 
