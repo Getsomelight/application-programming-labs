@@ -51,7 +51,7 @@ def img_download(search_name: str, folder: str) -> None:
     if not os.path.isdir(folder):
         os.makedirs(folder)
     crawler = GoogleImageCrawler(storage={"root_dir": folder})
-    crawler.crawl(keyword=search_name, max_num=50)
+    crawler.crawl(keyword=search_name, max_num=10)
 
 
 
