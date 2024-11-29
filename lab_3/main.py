@@ -1,21 +1,19 @@
 import os
 import argparse
+from array import ArrayType
 import cv2 as cv
 import matplotlib.pyplot as plt
-import numpy as np
 
 
 
-def histogram(image_name: str) -> None:
+def histogram(img: ArrayType) -> None:
     """
     Plots the histogram of an image showing the distribution of pixel intensities
     for each color channel (Red, Green, Blue).
 
     args:
-    image_name (str): The path to the image file to analyze.
+    img (ArrayType): The image.
     """
-    img = cv.imread(image_name)
-    assert image_name is not None, "File doesnt found"
     print("Image size: ", img.shape)
     color = ('b', 'g', 'r')
     for i, col in enumerate(color):
@@ -29,17 +27,15 @@ def histogram(image_name: str) -> None:
     plt.show()
 
 
-
-def work_with_image(image_name: str, new_image_path: str) -> None:
+def inverting_image(img: ArrayType, new_image_path: str) -> None:
     """
     Processes an image by inverting its color channels (creating a negative effect),
     displays the processed image, and saves it to the specified directory.
 
     args:
-    image_name (str): The path to the image file to process.
+    img (ArrayType): The image to process.
     new_image_path (str): The directory where the processed image will be saved.
     """
-    img = cv.imread(image_name, cv.IMREAD_COLOR)
     b, g, r = cv.split(img)
     b = 255 - b
     g = 255 - g
@@ -47,10 +43,8 @@ def work_with_image(image_name: str, new_image_path: str) -> None:
     new_image = cv.merge((r, g, b))
     plt.imshow(new_image)
     plt.show()
-    if not os.path.isdir(new_image_path):
-        os.makedirs(new_image_path)
-    result = os.path.join(new_image_path, "new_image.jpg")
-    cv.imwrite(result, new_image)
+    os.makedirs(new_image_path, exist_ok = True)
+    cv.imwrite(os.path.join(new_image_path, "new_image.jpg"), new_image)
 
 
 
@@ -63,8 +57,10 @@ def main() -> None:
     parser.add_argument('image_name', type = str)
     parser.add_argument('new_image_path', type = str)
     args = parser.parse_args()
-    histogram(args.image_name)
-    work_with_image(args.image_name, args.new_image_path)
+    img = cv.imread(args.image_name)
+    assert args.image_name is not None, "File doesnt found"
+    histogram(img)
+    inverting_image(img, args.new_image_path)
 
 
 
