@@ -1,6 +1,6 @@
-import argparse
-import csv
 import os
+import csv
+import argparse
 from icrawler.builtin import GoogleImageCrawler
 
 
@@ -39,7 +39,7 @@ class ImageIterator:
 
 
 
-def img_download(search_name: str, folder: str) -> None:
+def img_download(search_name: str, folder: str, num_pic: int) -> None:
     """
     Creates the folder if it doesn't exist
     Downloads images based on a search_name and saves them to a folder
@@ -51,7 +51,7 @@ def img_download(search_name: str, folder: str) -> None:
     if not os.path.isdir(folder):
         os.makedirs(folder)
     crawler = GoogleImageCrawler(storage={"root_dir": folder})
-    crawler.crawl(keyword=search_name, max_num=10)
+    crawler.crawl(keyword=search_name, max_num=num_pic)
 
 
 
@@ -69,8 +69,9 @@ def annotations(folder: str, annotation: str) -> None:
         for filename in filenames:
             if filename.endswith(('.jpg', '.jpeg', '.webp', '.png')):
                 path.append(os.path.join(directory, filename))
-    with open(annotation, 'w', newline = '') as file:
+    with open(annotation, 'w', newline = '', encoding='utf-8') as file:
         write = csv.writer(file)
+        write.writerow(["paths"])
         for path in path:
             abspath = os.path.abspath(path)
             relpath = os.path.relpath(path, start=os.path.dirname(annotation))
@@ -87,8 +88,9 @@ def main() -> None:
     parser.add_argument('search_name', type = str)
     parser.add_argument('folder', type = str)
     parser.add_argument('annotation', type = str)
+    parser.add_argument('num_pic', type=int)
     args = parser.parse_args()
-    img_download(args.search_name, args.folder)
+    img_download(args.search_name, args.folder, args.num_pic)
     annotations(args.folder, args.annotation)
     image_iterator = ImageIterator(args.annotation)
     for i in image_iterator:
