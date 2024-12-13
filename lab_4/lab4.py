@@ -45,22 +45,14 @@ def sorted_dataframe(df: pd.DataFrame, max_width: int, max_height: int) -> pd.Da
     returns:
     pd.DataFrame: Sorted DataFrame with an additional column for area.
     """
-    s = pd.DataFrame()
+    df = df[df['width'].apply(lambda x: x <= max_width)]
+    df = df[df['height'].apply(lambda x: x <= max_height)]
+    df = df.reindex(columns=list(df.columns) + ["area"])
     for i in range(0, len(df)):
-        if (df.iloc[i, 2] <= max_width) and (df.iloc[i, 3] <= max_height):
-            s1 = pd.DataFrame({"Absolute": [""], "Relative": [""], "width": [""], "height": [""], "deep": [""]})
-            s1["Absolute"] = df.iloc[i, 0]
-            s1["Relative"] = df.iloc[i, 1]
-            s1["width"] = df.iloc[i, 2]
-            s1["height"] = df.iloc[i, 3]
-            s1["deep"] = df.iloc[i, 4]
-            s = pd.concat([s, s1], ignore_index=True)
-    s = s.reindex(columns=list(df.columns) + ["area"])
-    for i in range(0, len(s)):
-        s.iloc[i, 5] = s.iloc[i, 2] * s.iloc[i, 3]
-    s = s.sort_values(by = "area")
-    print(s)
-    return s
+        df.iloc[i, 5] = df.iloc[i, 2] * df.iloc[i, 3]
+    df = df.sort_values(by="area")
+    print(df)
+    return df
 
 
 def histogram(df: pd.DataFrame) -> None:
