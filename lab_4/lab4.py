@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 
 def make_dataframe(annotation_path: str) -> pd.DataFrame:
     """
-    Creates a DataFrame based on annotations from a CSV file.
+    Creates a DataFrame based on annotations from a CSV file and
+    calculates the area (width * height).
 
     args:
     annotation_path (str): Path to the CSV file with annotations.
@@ -20,12 +21,13 @@ def make_dataframe(annotation_path: str) -> pd.DataFrame:
     s = pd.DataFrame()
     df = pd.read_csv(annotation_path)
     for i in range (0, len(df), 2):
-        s1 = pd.DataFrame({"Absolute": [""], "Relative": [""], "width": [""], "height": [""], "deep": [""]})
+        s1 = pd.DataFrame({"Absolute": [""], "Relative": [""], "width": [""], "height": [""], "deep": [""], "area": [""]})
         s1["Absolute"] = df.iloc[i, 0]
         s1["Relative"] = df.iloc[i + 1, 0]
         a = "..\\" + df.iloc[i + 1, 0]
         img = cv.imread(a)
         s1["width"], s1["height"], s1["deep"] = img.shape
+        s1["area"] = s1["width"] * s1["height"]
         s = pd.concat([s, s1], ignore_index=True)
     print(s)
     print(s.describe(include="int64"))
@@ -34,8 +36,8 @@ def make_dataframe(annotation_path: str) -> pd.DataFrame:
 
 def sorted_dataframe(df: pd.DataFrame, max_width: int, max_height: int) -> pd.DataFrame:
     """
-    Filters images with dimensions less than or equal to the specified width and height.
-    Calculates the area (width * height) and sorts the DataFrame by this area.
+    Filters images with dimensions less than or equal to the specified width and height
+    and sorts the DataFrame by this area.
 
     args:
     df (pd.DataFrame): Input DataFrame with image data.
@@ -45,12 +47,9 @@ def sorted_dataframe(df: pd.DataFrame, max_width: int, max_height: int) -> pd.Da
     returns:
     pd.DataFrame: Sorted DataFrame with an additional column for area.
     """
-    df = df[df['width'].apply(lambda x: x <= max_width)]
-    df = df[df['height'].apply(lambda x: x <= max_height)]
-    df = df.reindex(columns=list(df.columns) + ["area"])
-    for i in range(0, len(df)):
-        df.iloc[i, 5] = df.iloc[i, 2] * df.iloc[i, 3]
-    df = df.sort_values(by="area")
+    df = df[df["width"] <= max_width]
+    df = df[df["height"] <= max_height]
+    df = df.sort_values(by = "area")
     print(df)
     return df
 
